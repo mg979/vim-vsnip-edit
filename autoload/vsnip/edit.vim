@@ -163,6 +163,8 @@ fun! s:update_snipptes_file() abort
   exe s:pretty_print
   setlocal noexpandtab tabstop=4 softtabstop=4 shiftwidth=4
   retab!
+  update
+  call vsnip#source#refresh(fnamemodify(bufname('%'), ':p'))
   call search('^\s*"' . s:name)
 endfun
 
