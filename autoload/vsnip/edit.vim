@@ -141,6 +141,7 @@ endfun
 " s:save_snippet
 ""
 fun! s:save_snippet() abort
+  retab!
   let lines = getline(1, line('$'))
   bwipeout!
   exe 'topleft vsplit' fnameescape(s:json_path)
