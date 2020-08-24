@@ -135,6 +135,8 @@ fun! s:temp_buffer(ft) abort
   setlocal nomodified
   let &l:statusline = ' Editing snippet: %#CursorLine#  ' . s:name . '%=%#WarningMsg# (:w to save snippet) '
   autocmd BufWriteCmd <buffer> call s:save_snippet()
+  autocmd TextChangedI <buffer> call timer_start(200, { t -> !pumvisible() ? feedkeys("\<C-G>\<C-G>\<C-X>\<C-U>", 'n') ? '' : '' : '' })
+  setlocal completefunc=vsnip#edit#variable
   inoremap <buffer><expr> $ matchstr(getline('.'),'\%'.(col('.')-1).'c.')=='\'?'$':"${}\<C-G>U\<Left>"
 endfun
 
@@ -196,5 +198,57 @@ fun! s:save_new_snippet(lines) abort
   let snip.prefix = [prefix]
   let s:snippets[s:name] = snip
   call s:update_snipptes_file()
+endfun
+
+
+""
+" Variable completion
+""
+let s:variables = [
+      \ {'word': 'TM_SELECTED_TEXT',         'kind': "\tThe currently selected text or the empty string"},
+      \ {'word': 'TM_CURRENT_LINE',          'kind': "\tThe contents of the current line"},
+      \ {'word': 'TM_CURRENT_WORD',          'kind': "\tThe contents of the word under cursor or the empty string"},
+      \ {'word': 'TM_LINE_INDEX',            'kind': "\tThe zero-index based line number"},
+      \ {'word': 'TM_LINE_NUMBER',           'kind': "\tThe one-index based line number"},
+      \ {'word': 'TM_FILENAME',              'kind': "\tThe filename of the current document"},
+      \ {'word': 'TM_FILENAME_BASE',         'kind': "\tThe filename of the current document without its extensions"},
+      \ {'word': 'TM_DIRECTORY',             'kind': "\tThe directory of the current document"},
+      \ {'word': 'TM_FILEPATH',              'kind': "\tThe full file path of the current document"},
+      \ {'word': 'CLIPBOARD',                'kind': "\tThe contents of your clipboard"},
+      \ {'word': 'WORKSPACE_NAME',           'kind': "\tThe name of the opened workspace or folder"},
+      \ {'word': 'CURRENT_YEAR',             'kind': "\tThe current year"},
+      \ {'word': 'CURRENT_YEAR_SHORT',       'kind': "\tThe current year's last two digits"},
+      \ {'word': 'CURRENT_MONTH',            'kind': "\tThe month as two digits (example '02')"},
+      \ {'word': 'CURRENT_MONTH_NAME',       'kind': "\tThe full name of the month (example 'July')"},
+      \ {'word': 'CURRENT_MONTH_NAME_SHORT', 'kind': "\tThe short name of the month (example 'Jul')"},
+      \ {'word': 'CURRENT_DATE',             'kind': "\tThe day of the month"},
+      \ {'word': 'CURRENT_DAY_NAME',         'kind': "\tThe name of day (example 'Monday')"},
+      \ {'word': 'CURRENT_DAY_NAME_SHORT',   'kind': "\tThe short name of the day (example 'Mon')"},
+      \ {'word': 'CURRENT_HOUR',             'kind': "\tThe current hour in 24-hour clock format"},
+      \ {'word': 'CURRENT_MINUTE',           'kind': "\tThe current minute"},
+      \ {'word': 'CURRENT_SECOND',           'kind': "\tThe current second"},
+      \ {'word': 'CURRENT_SECONDS_UNIX',     'kind': "\tThe number of seconds since the Unix epoch"},
+      \ {'word': 'BLOCK_COMMENT_START',      'kind': "\tExample output: in PHP /* or in HTML <!--"},
+      \ {'word': 'BLOCK_COMMENT_END',        'kind': "\tExample output: in PHP */ or in HTML -->"},
+      \ {'word': 'LINE_COMMENT',             'kind': "\tExample output: in PHP //"},
+      \]
+
+""
+" vsnip#edit#variable: completefunc method for built-in variables
+""
+fun! vsnip#edit#variable(findstart, base) abort
+  if a:findstart
+    " locate the start of the word
+    let beforeCur = getline('.')[:(getcurpos()[2]-2)]
+    return match(beforeCur, '\k\k\+$')
+  else
+    " find match
+    if empty(a:base)
+      return []
+    endif
+    let fuzzy = join(split(a:base, '\zs'), '\.\{-}')
+    let words = filter(copy(s:variables), { k,v -> v.word =~ '^\V' . fuzzy })
+    return { 'words': words, 'refresh': 'always' }
+  endif
 endfun
 
