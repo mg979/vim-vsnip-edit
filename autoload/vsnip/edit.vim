@@ -117,7 +117,7 @@ endfun
 " s:temp_buffer
 ""
 fun! s:temp_buffer(ft) abort
-  noautocmd keepalt new! Vsnip\ snippet
+  keepalt new! Vsnip\ snippet
   exe 'setf' a:ft
   setlocal noexpandtab
   setlocal list
