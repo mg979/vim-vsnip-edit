@@ -169,7 +169,8 @@ fun! s:update_snipptes_file() abort
   retab!
   update
   call vsnip#source#refresh(fnamemodify(bufname('%'), ':p'))
-  call search('^\s*"' . s:name)
+  let name = escape(s:name, '\"')
+  call search('^\V\s\*"' . escape(name, '\') . '":')
 endfun
 
 ""
