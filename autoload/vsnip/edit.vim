@@ -144,7 +144,6 @@ endfun
 " s:save_snippet
 ""
 fun! s:save_snippet() abort
-  retab!
   let lines = getline(1, line('$'))
   bwipeout!
   exe 'topleft vsplit' fnameescape(s:json_path)
@@ -165,8 +164,9 @@ fun! s:update_snipptes_file() abort
   put =json_encode(s:snippets)
   silent 1d _
   exe s:pretty_print
-  setlocal noexpandtab tabstop=4 softtabstop=4 shiftwidth=4
-  retab!
+  setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
+  " turn tabs into spaces when not at the beginnning of the line
+  silent! %s/[^\t]\zs\t/\\t/g
   update
   call vsnip#source#refresh(fnamemodify(bufname('%'), ':p'))
   let name = escape(s:name, '\"')
