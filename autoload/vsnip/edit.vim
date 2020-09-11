@@ -138,6 +138,7 @@ fun! s:temp_buffer(ft) abort
   inoremap <buffer> <C-V> <C-X><C-U>
   setlocal completefunc=vsnip#edit#variable
   inoremap <buffer><expr> $ matchstr(getline('.'),'\%'.(col('.')-1).'c.')=='\'?'$':"${}\<C-G>U\<Left>"
+  xnoremap <buffer> $ A}<esc>lm>`<i${<esc>lm<gv
 endfun
 
 ""
