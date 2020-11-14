@@ -9,10 +9,10 @@ fun! vsnip#edit#complete(A, L, P) abort
   endif
   let snippets = []
   for p in paths
-    let json = json_decode(readfile(p))
+    let json = json_decode(has('nvim') ? readfile(p) : join(readfile(p)))
     let snippets = snippets + keys(json)
   endfor
-  return filter(sort(snippets), 'v:val=~#a:A')
+  return filter(sort(snippets), 'v:val =~# "^" . a:A')
 endfun
 
 ""
@@ -59,7 +59,8 @@ fun! vsnip#edit#snippet(name, bang) abort
     endif
   endif
 
-  let s:snippets = json_decode(readfile(s:json_path))
+  let data = readfile(s:json_path)
+  let s:snippets = json_decode(has('nvim') ? data : join(data))
   call s:temp_buffer(&filetype)
 endfun
 
