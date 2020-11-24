@@ -136,7 +136,6 @@ fun! s:temp_buffer(ft) abort
   setlocal nomodified
   let &l:statusline = ' Editing snippet: %#CursorLine#  ' . s:name . '%=%#WarningMsg# (:w to save snippet) '
   autocmd BufWriteCmd <buffer> call s:save_snippet()
-  inoremap <buffer> <C-V> <C-X><C-U>
   setlocal completefunc=vsnip#edit#variable
   inoremap <buffer><expr> $ matchstr(getline('.'),'\%'.(col('.')-1).'c.')=='\'?'$':"${}\<C-G>U\<Left>"
   xnoremap <buffer> $ A}<esc>lm>`<i${<esc>lm<gv
